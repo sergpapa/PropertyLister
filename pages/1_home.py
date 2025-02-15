@@ -2,4 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-st.title('Real Estate Property Catalog')
+
+def main():
+    st.title('Real Estate Property Catalog')
+
+    return
+
+main()

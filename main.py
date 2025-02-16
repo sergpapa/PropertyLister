@@ -7,9 +7,10 @@ import numpy as np
 def open_details(row_data, image, lang):
     main_dtls_1, main_dtls_2 = st.columns([3,1])
     img = st.columns(1)
-    sub_dtls_1, sub_dtls_2 = st.columns([1,1])
-    sub_dtls_3, sub_dtls_4 = st.columns([1,1])
-    cat = st.columns(1)
+    sub_dtls_1, sub_dtls_2, sub_dtls_3 = st.columns([1,1,1])
+
+    sub_dtls_4, sub_dtls_5, sub_dtls_6 = st.columns([1,1,1])
+    link = st.columns(1)
     summary = st.columns(1)
 
     main_dtls_1.markdown(f"<p class='head_dtls' style='font-size:24px;'>{row_data['address_gr']}</p>", unsafe_allow_html=True)
@@ -27,25 +28,36 @@ def open_details(row_data, image, lang):
     else:
         sub_dtls_2.markdown(f"<strong>Τιμή ανά τ.μ.:</strong> -", unsafe_allow_html=True)
     
+    category = f"category_{lang}"
+    if type(category) == str:
+        sub_dtls_3.markdown(F"<strong>Κατηγορία:</strong> {row_data[category]}", unsafe_allow_html=True)
+    
     if str(row_data['construction_year']) != 'nan':
         year = int(row_data['construction_year'])
-        sub_dtls_3.markdown(f"<strong>Έτος Κατασκευής:</strong> {year}", unsafe_allow_html=True)
+        sub_dtls_4.markdown(f"<strong>Έτος Κατασκευής:</strong> {year}", unsafe_allow_html=True)
     else:
-        sub_dtls_3.markdown(f"<strong>Έτος Κατασκευής:</strong> -", unsafe_allow_html=True)
+        sub_dtls_4.markdown(f"<strong>Έτος Κατασκευής:</strong> -", unsafe_allow_html=True)
     
-    if type(row_data['floor_num']) == str:
-        sub_dtls_4.markdown(f"<strong>Όροφος:</strong> {row_data['floor_num']}", unsafe_allow_html=True)
+    if type(row_data['floor_num']) == float:
+        sub_dtls_5.markdown(f"<strong>Όροφος:</strong> {int(row_data['floor_num'])}", unsafe_allow_html=True)
     else:
-        sub_dtls_4.markdown(f"<strong>Όροφος:</strong> -", unsafe_allow_html=True)
+        sub_dtls_5.markdown(f"<strong>Όροφος:</strong> -", unsafe_allow_html=True)
     
     if type(row_data['has_parking']) == str:
         if row_data['has_parking'] == 'TRUE':
-            sub_dtls_3.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Ναι", unsafe_allow_html=True)
+            sub_dtls_6.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Ναι", unsafe_allow_html=True)
         else:
-            sub_dtls_3.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Όχι", unsafe_allow_html=True)
+            sub_dtls_6.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Όχι", unsafe_allow_html=True)
+    elif type(row_data['has_parking']) == bool:
+        if row_data['has_parking']:
+            sub_dtls_6.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Ναι", unsafe_allow_html=True)
+        else:
+            sub_dtls_6.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Όχι", unsafe_allow_html=True)
 
-    category = f"category_{lang}"
-    cat[0].markdown(F"<strong>Κατηγρία:</strong> {row_data[category]}", unsafe_allow_html=True)
+    if type(row_data['url']) == str:
+        link[0].markdown(f"<strong>Link:</strong> {row_data['url']}", unsafe_allow_html=True)
+    else:
+        link[0].markdown(f"<strong>Link:</strong> -", unsafe_allow_html=True)
         
     summary[0].markdown(f"<p class='summary_modal'><strong>Περιγραφή:</strong> {row_data['description_gr']}</p>", unsafe_allow_html=True)
 

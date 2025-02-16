@@ -171,7 +171,7 @@ def show_page(data, page, lang):
                             img[0].markdown(f"<img class='image' src='https://placehold.co/250x250' style='width:100%;'>", unsafe_allow_html=True)
                         
                         category = f"category_{lang}"
-                        sub_dtls_1.write(F"<strong>Κατηγρία:</strong> {row_data[category]}", unsafe_allow_html=True)
+                        sub_dtls_1.write(F"<strong>Κατηγορία:</strong> {row_data[category]}", unsafe_allow_html=True)
 
                         if sub_dtls_2.button('More', key=f"more_{i+j}"):
                             open_details(row_data, image, lang)

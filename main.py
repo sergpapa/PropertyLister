@@ -37,6 +37,12 @@ def open_details(row_data, image, lang):
         sub_dtls_4.markdown(f"<strong>Όροφος:</strong> {row_data['floor_num']}", unsafe_allow_html=True)
     else:
         sub_dtls_4.markdown(f"<strong>Όροφος:</strong> -", unsafe_allow_html=True)
+    
+    if type(row_data['has_parking']) == str:
+        if row_data['has_parking'] == 'TRUE':
+            sub_dtls_3.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Ναι", unsafe_allow_html=True)
+        else:
+            sub_dtls_3.markdown(f"<strong>Χώρος Στάθμευσης:</strong> Όχι", unsafe_allow_html=True)
 
     category = f"category_{lang}"
     cat[0].markdown(F"<strong>Κατηγρία:</strong> {row_data[category]}", unsafe_allow_html=True)
@@ -45,9 +51,119 @@ def open_details(row_data, image, lang):
 
     return
 
+
+def apply_style():
+
+    st.markdown("""
+    <style>
+    .st-emotion-cache-ue6h4q {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgb(85, 88, 103);
+        line-height: 1.5;
+        padding-right: 0.5rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    return
+
+
+def create_sidebar():
+
+    sidebar = st.sidebar
+    search_term = sidebar.text_input('##### Search Properties', key='search', placeholder='Search by address, price, etc.')
+
+    if search_term:
+        if st.session_state.search_term != search_term:
+            st.session_state.search_term = search_term
+            st.rerun() 
+    
+    sidebar.write('##### Filter Properties')
+
+    has_parking = sidebar.toggle('Parking')
+    has_storage = sidebar.toggle('Storage')
+
+    filter_data = False
+
+    if st.session_state.parking != has_parking:
+        if has_parking:
+            st.session_state.parking = True
+            filter_data = True
+        else:
+            st.session_state.parking = False
+            filter_data = True
+    
+    if st.session_state.storage != has_storage:
+        if has_storage:
+            st.session_state.storage = True
+            filter_data = True
+        else:
+            st.session_state.storage = False
+            filter_data = True
+    
+    if filter_data:
+        st.rerun()
+
+    return sidebar
+
+
+def set_data(file_name):
+    if file_name:
+        st.session_state.file = file_name
+    else:
+        if 'file' not in st.session_state:
+            st.session_state.file = 'real_estate_property_catalog.csv'
+
+    data = pd.read_csv(st.session_state.file)
+
+    data['has_parking'] = data['has_parking'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
+    data['has_storage'] = data['has_storage'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
+
+
+    d = data.iloc[10].astype(object).to_dict()
+
+    if 'search_term' in st.session_state and st.session_state.search_term:
+        data = search_query(data, st.session_state.search_term)
+    
+    filters = []
+
+    if st.session_state.parking:
+        filters.append('parking')
+    if st.session_state.storage:
+        filters.append('storage')
+    
+    if len(filters) > 0:
+        data = search_query(data, filters)
+    
+    return data, st.session_state.file
+
+
+def search_query(data, keywords):
+
+    if isinstance(keywords, list):
+        query = []
+        if 'parking' in keywords:
+            query.append('has_parking == True')
+        if 'storage' in keywords:
+            query.append('has_storage == True')
+        
+        if query:
+            query_str = ' & '.join(query)
+            filtered_data = data.query(query_str, engine='python')
+        else:
+            filtered_data = data
+    else:
+     filtered_data = data.query('address_gr.str.contains(@keywords) & description_gr.str.contains(@keywords)', engine='python')
+
+    return filtered_data
+
+
 def main():
 
     st.set_page_config(layout="wide")
+
+    apply_style()
 
     pages = {
         "Home": [st.Page("pages/1_home.py", title="Real Estate Property Catalog")],
@@ -57,8 +173,30 @@ def main():
         ],
     }
 
+    if 'lang' not in st.session_state:
+        st.session_state.lang = 'gr'
+    if 'search_term' not in st.session_state:
+        st.session_state.search_term = None
+    if 'parking' not in st.session_state:
+        st.session_state.parking = False
+    if 'storage' not in st.session_state:
+        st.session_state.storage = False
+
+    col = st.columns(1)
+    en = col[0].toggle("GR/EN", False, help="Change language")
+    if en:
+        st.session_state.lang = 'en'
+    else:
+        st.session_state.lang = 'gr'
+
+
     pg = st.navigation(pages)
     pg.run()
+
+    sidebar = create_sidebar()
+
+    return
+
 
 if __name__ == "__main__":
     main()

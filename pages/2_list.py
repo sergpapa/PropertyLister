@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-from main import open_details
+from main import open_details, set_data
 
 # fields = [
 #     "created_at",
@@ -72,43 +72,29 @@ def apply_styles():
     )
     return
 
+
 def main():
     apply_styles()
     
-    st.title('Property Listings - List')
-    st.markdown('<hr>', unsafe_allow_html=True) 
-
     col1, col2 = st.columns([2,1])
-    lang = col1.radio('Select Language', ['gr', 'en'])
+    lang = st.session_state.lang
 
+    col1.title('Property Listings - List')
     file = col2.file_uploader('Upload a CSV file', type=['csv'])
-    col2.button('Remove File', key='remove_file', on_click=lambda: st.session_state.pop('file', None))
 
-    # Load the data
     if file:
-        try:
-            subtitle = f"{file.name}"
-            data = pd.read_csv(file)
-
-            #### validation of fileds and values
-        except Exception as e:
-            st.error(f"Error reading CSV file: {e}")
-            return
+        data, subtitle = set_data(file.name)
     else:
-        try:
-            subtitle = "real_estate_property_catalog.csv"
-            data = pd.read_csv('real_estate_property_catalog.csv')
-        except Exception as e:  
-            st.error(f"Error reading CSV file: {e}")
-            return
+        data, subtitle = set_data(None)
         
-    st.markdown('<hr>', unsafe_allow_html=True)
     st.write(f"***Reading Data From:*** *{subtitle}*")
 
     if 'page' not in st.session_state:
         st.session_state.page = 1
 
     pages = len(data) // 21
+    if pages == 0:
+        pages = 1
 
     # Display data page
     show_page(data, st.session_state.page, lang)

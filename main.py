@@ -17,7 +17,7 @@ def open_details(row_data, image, lang):
 
     img[0].markdown(f"<img class='image_modal' src='{image}' style='width:100%;'>", unsafe_allow_html=True)
     
-    if type(row_data['surface']) == str:
+    if type(row_data['surface']) == float:
         sub_dtls_1.markdown(f"<strong>Εμβαδόν:</strong> {row_data['surface']} τ.μ.", unsafe_allow_html=True)
     else:
         sub_dtls_1.markdown(f"<strong>Εμβαδόν:</strong> -", unsafe_allow_html=True)
@@ -74,17 +74,48 @@ def create_sidebar():
     sidebar = st.sidebar
     search_term = sidebar.text_input('##### Search Properties', key='search', placeholder='Search by address, price, etc.')
 
-    if search_term:
-        if st.session_state.search_term != search_term:
-            st.session_state.search_term = search_term
-            st.rerun() 
     
     sidebar.write('##### Filter Properties')
+
+    price_min = sidebar.number_input('Price Min', placeholder='0', min_value=0)
+    price_max = sidebar.number_input('Price Max', placeholder='1000000', min_value=0)
+
+    surface_min = sidebar.number_input('Surface Min', placeholder='0', min_value=0)
+    surface_max = sidebar.number_input('Surface Max', placeholder='500', min_value=0)
+
+    construction_year = sidebar.number_input('Construction Year', placeholder='0', min_value=0)
 
     has_parking = sidebar.toggle('Parking')
     has_storage = sidebar.toggle('Storage')
 
+    sidebar.button('Clear Filters', key='clear_filters', on_click=lambda: st.session_state.clear(
+        price_min=None, price_max=None, surface_min=None, surface_max=None, construction_year=None, parking=False, storage=False
+    ))
+
     filter_data = False
+
+    if search_term:
+        if st.session_state.search_term != search_term:
+            st.session_state.search_term = search_term
+            filter_data = True
+
+    if st.session_state.price_min != price_min:
+        st.session_state.price_min = price_min
+        filter_data = True
+    if st.session_state.price_max != price_max:
+        st.session_state.price_max = price_max
+        filter_data = True
+    
+    if st.session_state.surface_min != surface_min:
+        st.session_state.surface_min = surface_min
+        filter_data = True
+    if st.session_state.surface_max != surface_max:
+        st.session_state.surface_max = surface_max
+        filter_data = True
+    
+    if st.session_state.construction_year != construction_year:
+        st.session_state.construction_year = construction_year
+        filter_data = True
 
     if st.session_state.parking != has_parking:
         if has_parking:
@@ -106,57 +137,118 @@ def create_sidebar():
         st.rerun()
 
     return sidebar
-
+    
 
 def set_data(file_name):
+
+    errors = []
+
     if file_name:
         st.session_state.file = file_name
     else:
-        if 'file' not in st.session_state:
-            st.session_state.file = 'real_estate_property_catalog.csv'
+        st.session_state.file = 'real_estate_property_catalog.csv'
 
     data = pd.read_csv(st.session_state.file)
 
     data['has_parking'] = data['has_parking'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
     data['has_storage'] = data['has_storage'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
 
+    data['price'] = data['price'].fillna(0)
+    data['price'] = data['price'].str.replace(',', '')
+    data['price'] = pd.to_numeric(data['price'], errors='coerce')
 
-    d = data.iloc[10].astype(object).to_dict()
+    data['surface'] = data['surface'].fillna(0)
+    data['surface'] = pd.to_numeric(data['surface'], errors='coerce')
 
-    if 'search_term' in st.session_state and st.session_state.search_term:
-        data = search_query(data, st.session_state.search_term)
+    data['construction_year'] = pd.to_numeric(data['construction_year'], errors='coerce')
     
     filters = []
 
+    if 'search_term' in st.session_state and st.session_state.search_term:
+        filters.append('search_term')
+
+    if st.session_state.price_min:
+        filters.append('price_min')
+    if st.session_state.price_max:
+        filters.append('price_max')
+
+    if st.session_state.surface_min:
+        filters.append('surface_min')
+    if st.session_state.surface_max:
+        filters.append('surface_max')
+
+    if st.session_state.construction_year:
+        filters.append('construction_year')
+
     if st.session_state.parking:
         filters.append('parking')
+
     if st.session_state.storage:
         filters.append('storage')
     
     if len(filters) > 0:
-        data = search_query(data, filters)
+        data, err_data_2 = search_query(data, filters)
+
+        if err_data_2:
+            errors.append(err_data_2)
     
-    return data, st.session_state.file
+    if errors:
+        return data, st.session_state.file, errors
+    else:
+        return data, st.session_state.file, None
 
 
 def search_query(data, keywords):
 
+    errors = []
+
     if isinstance(keywords, list):
         query = []
+
+        if 'price_min' in keywords:
+            if st.session_state.price_min is not None:
+                query.append(f'price >= {st.session_state.price_min}')
+        if 'price_max' in keywords:
+            if st.session_state.price_max is not None:
+                query.append(f'price <= {st.session_state.price_max}')
+
+        if 'surface_min' in keywords:
+            if st.session_state.surface_min is not None:
+                query.append(f'surface >= {st.session_state.surface_min}')
+        if 'surface_max' in keywords:
+            if st.session_state.surface_max is not None:
+                query.append(f'surface <= {st.session_state.surface_max}')
+
+        if 'construction_year' in keywords:
+            if st.session_state.construction_year is not None:
+                query.append(f'construction_year == {st.session_state.construction_year}')
+        
         if 'parking' in keywords:
             query.append('has_parking == True')
+
         if 'storage' in keywords:
             query.append('has_storage == True')
         
+        if 'search_term' in keywords:
+            key = st.session_state.search_term
+            query.append('(address_gr.str.contains(@key) | description_gr.str.contains(@key))')
+
         if query:
             query_str = ' & '.join(query)
             filtered_data = data.query(query_str, engine='python')
         else:
             filtered_data = data
     else:
-     filtered_data = data.query('address_gr.str.contains(@keywords) & description_gr.str.contains(@keywords)', engine='python')
-
-    return filtered_data
+        filtered_data = data
+    
+    if filtered_data.empty:
+        filtered_data = data
+        errors.append('No results found for the search term')
+    
+    if errors:
+        return filtered_data, errors
+    else:
+        return filtered_data, None
 
 
 def main():
@@ -177,6 +269,17 @@ def main():
         st.session_state.lang = 'gr'
     if 'search_term' not in st.session_state:
         st.session_state.search_term = None
+    
+    if 'price_max' not in st.session_state:
+        st.session_state.price_max = None
+    if 'price_min' not in st.session_state:
+        st.session_state.price_min = None
+    if 'surface_max' not in st.session_state:
+        st.session_state.surface_max = None
+    if 'surface_min' not in st.session_state:
+        st.session_state.surface_min = None
+    if 'construction_year' not in st.session_state:
+        st.session_state.construction_year = None
     if 'parking' not in st.session_state:
         st.session_state.parking = False
     if 'storage' not in st.session_state:

@@ -74,6 +74,9 @@ def apply_styles():
 
 
 def main():
+
+    errors = []
+
     apply_styles()
     
     col1, col2 = st.columns([2,1])
@@ -83,9 +86,18 @@ def main():
     file = col2.file_uploader('Upload a CSV file', type=['csv'])
 
     if file:
-        data, subtitle = set_data(file.name)
+        data, subtitle, err_data = set_data(file.name)
+
+        if err_data:
+            for err in err_data:
+                st.error(f"Errors in data: {err[0]}")
+        
     else:
-        data, subtitle = set_data(None)
+        data, subtitle, err_data = set_data(None)
+
+        if err_data:
+            for err in err_data:
+                st.error(f"Errors in data: {err[0]}")
         
     st.write(f"***Reading Data From:*** *{subtitle}*")
 

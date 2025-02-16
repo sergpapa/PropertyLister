@@ -12,7 +12,11 @@ def main():
 
     lang = st.session_state.lang
 
-    data, subtitle = set_data(None)
+    data, subtitle, err_data = set_data(None)
+
+    if err_data:
+        for err in err_data:
+            st.error(f"Errors in data: {err[0]}")
 
     st.write(f"***Reading Data From:*** *{subtitle}*")
 

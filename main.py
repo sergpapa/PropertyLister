@@ -1,22 +1,47 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
+import folium
+from streamlit_folium import st_folium
 
 @st.dialog("Περιγραφή Ιδιοκτησίας", width='large')
 def open_details(row_data, image, lang):
     main_dtls_1, main_dtls_2 = st.columns([3,1])
     img = st.columns(1)
+
+    if 'show_map' not in st.session_state:
+        st.session_state.show_map = False
+
+    if st.session_state.show_map:
+        map = show_map(row_data, image)
+        st_folium(map, width=700, height=400)
+
+    else:
+        img[0].markdown(
+            f"""<div style='position:relative;width:100%;height:400px;overflow:hidden;border-radius:2%;'>
+                <img class='image_modal' src='{image}' style='width:100%;'>
+            </div>""", unsafe_allow_html=True)
+    
+    if img[0].button('map', key='map'):
+        map = show_map(row_data, image)
+        st_folium(map, width=700, height=400)
+        st.session_state.show_map = True
+    
+    show_img = st.columns(1)
+    if st.session_state.show_map:
+        if show_img[0].button('Close Map', key='close_map'):
+            st.session_state.show_map = False
+            map = show_map(row_data, image)
+            st_folium(map, key='placeholder', width=1, height=1)
+
     sub_dtls_1, sub_dtls_2, sub_dtls_3 = st.columns([1,1,1])
 
     sub_dtls_4, sub_dtls_5, sub_dtls_6 = st.columns([1,1,1])
-    link = st.columns(1)
+    link = st.columns(2)
     summary = st.columns(1)
 
     main_dtls_1.markdown(f"<p class='head_dtls' style='font-size:24px;'>{row_data['address_gr']}</p>", unsafe_allow_html=True)
     main_dtls_2.markdown(f"<p class='head_dtls' style='text-align:right;font-size:24px;'><strong>&#8364; {row_data['price']}</strong></p>", unsafe_allow_html=True)
-
-    img[0].markdown(f"<img class='image_modal' src='{image}' style='width:100%;'>", unsafe_allow_html=True)
     
     if type(row_data['surface']) == float:
         sub_dtls_1.markdown(f"<strong>Εμβαδόν:</strong> {row_data['surface']} τ.μ.", unsafe_allow_html=True)
@@ -75,6 +100,34 @@ def apply_style():
         line-height: 1.5;
         padding-right: 0.5rem;
     }
+    .st-key-map {
+        text-align:right;
+        position:absolute;
+        top:5px;left:-5px;
+        width:100%;height:100%;
+    }
+    .st-key-map button {
+        color: rgb(49, 51, 63)!important;
+        border-color: rgb(49, 51, 63)!important;
+    }
+    .st-key-map button:hover {
+        background-color: rgb(49, 51, 63);
+        color: rgb(255, 255, 255)!important;
+    }
+    .st-key-map_view .stButton, .st-key-list_view .stButton {
+        display: flex;
+        align-items: center;
+    }
+    .st-key-map_view .stButton {
+        justify-content: left;
+    }
+    .st-key-list_view .stButton {
+        justify-content: right;
+    }
+    .st-key-map_view button, .st-key-list_view button {
+        background-color: #ff5454!important;
+        color: white!important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -86,7 +139,6 @@ def create_sidebar():
     sidebar = st.sidebar
     search_term = sidebar.text_input('##### Search Properties', key='search', placeholder='Search by address, price, etc.')
 
-    
     sidebar.write('##### Filter Properties')
 
     price_min = sidebar.number_input('Price Min', placeholder='0', min_value=0)
@@ -156,9 +208,12 @@ def set_data(file_name):
     errors = []
 
     if file_name:
-        st.session_state.file = file_name
+        if 'file' not in st.session_state or st.session_state.file != file_name:
+            st.session_state.file = file_name
     else:
-        st.session_state.file = 'real_estate_property_catalog.csv'
+        if 'file' not in st.session_state:
+            st.session_state.file = 'real_estate_property_catalog.csv'
+
 
     data = pd.read_csv(st.session_state.file)
 
@@ -263,6 +318,14 @@ def search_query(data, keywords):
         return filtered_data, None
 
 
+def show_map(row_data, image_link):
+    lat = row_data['lat']
+    lng = row_data['lng']
+    
+    map = folium.Map(location=[lat, lng], zoom_start=15)
+    folium.Marker(location=[lat, lng], popup=row_data['address_gr'], lazy=True).add_to(map)
+    return map
+
 def main():
 
     st.set_page_config(layout="wide")
@@ -270,10 +333,10 @@ def main():
     apply_style()
 
     pages = {
-        "Home": [st.Page("pages/1_home.py", title="Real Estate Property Catalog")],
+        "Home": [st.Page("1_home.py", title="Real Estate Property Catalog")],
         "Property Listings": [
-            st.Page("pages/2_list.py", title="Property Listings - List"),
-            st.Page("pages/3_map.py", title="Property Listings - Map"), 
+            st.Page("2_list.py", title="Property Listings - List"),
+            st.Page("3_map.py", title="Property Listings - Map"), 
         ],
     }
 
@@ -303,7 +366,7 @@ def main():
         st.session_state.lang = 'en'
     else:
         st.session_state.lang = 'gr'
-
+    
 
     pg = st.navigation(pages)
     pg.run()

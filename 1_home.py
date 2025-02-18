@@ -18,7 +18,7 @@ def main():
                 errors.append(f"Errors in data: {err[0]}")
     else:
         file_name = st.session_state.file
-        data, subtitle, err_data = set_data('real_estate_property_catalog.csv')
+        data, subtitle, err_data = set_data(file_name)
         if err_data:
             for err in err_data:
                 errors.append(f"Errors in data: {err[0]}")

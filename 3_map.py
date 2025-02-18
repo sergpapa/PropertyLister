@@ -12,7 +12,10 @@ def main():
 
     lang = st.session_state.lang
 
-    data, subtitle, err_data = set_data(None)
+    if 'file' not in st.session_state:
+        data, subtitle, err_data = set_data(None)
+    else:
+        data, subtitle, err_data = set_data(st.session_state.file)
 
     if err_data:
         for err in err_data:

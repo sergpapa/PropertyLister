@@ -83,7 +83,8 @@ def main():
         st.session_state.page = 1
 
 
-    screen_width = get_monitors()[0].width
+    # screen_width = get_monitors()[0].width
+    screen_width = 1920
     
     pages = len(data) // 21
 

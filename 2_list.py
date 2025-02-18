@@ -2,6 +2,7 @@ import streamlit as st
 from main import open_details, set_data
 from screeninfo import get_monitors
 
+
 def apply_styles():
     st.markdown(
         """
@@ -46,6 +47,7 @@ def apply_styles():
         unsafe_allow_html=True
     )
     return
+
 
 def main():
     errors = []
@@ -113,6 +115,7 @@ def main():
                 st.rerun()
     return
 
+
 def show_page(data, page, lang, screen_width):
     # Calculate the indexes for the current page
     page_indicator = page * 21  
@@ -174,5 +177,6 @@ def show_page(data, page, lang, screen_width):
                     except Exception as e:
                         st.error(f"Error displaying row {i + j}: {e}")
     return
+
 
 main()

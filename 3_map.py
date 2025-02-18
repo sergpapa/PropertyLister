@@ -113,4 +113,5 @@ def create_popup_html(row_data, image, lang):
     """
     return popup_html
 
+
 main()

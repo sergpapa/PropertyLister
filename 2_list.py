@@ -1,34 +1,6 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-
 from main import open_details, set_data
-
-# fields = [
-#     "created_at",
-#     "updated_at",
-#     "category_en",
-#     "category_gr",
-#     "category_source_en",
-#     "type_gr",
-#     "operation",
-#     "lng",
-#     "lat",
-#     "surface",
-#     "construction_year",
-#     "price",
-#     "price_per_m2",
-#     "has_parking",
-#     "has_storage",
-#     "floor_num",
-#     "floor_cnt",
-#     "floor_min",
-#     "address_gr",
-#     "description_gr",
-#     "url",
-#     "img_url",
-#     "postcode"
-# ]
+from screeninfo import get_monitors
 
 def apply_styles():
     st.markdown(
@@ -66,15 +38,16 @@ def apply_styles():
             -webkit-box-orient: vertical;
             text-overflow: ellipsis;
         }
+        .stFileUploaderFile {
+            display: none;
+        }
         </style>
         """,
         unsafe_allow_html=True
     )
     return
 
-
 def main():
-
     errors = []
 
     apply_styles()
@@ -84,6 +57,9 @@ def main():
 
     col1.title('Property Listings - List')
     file = col2.file_uploader('Upload a CSV file', type=['csv'])
+    if col2.button('Remove File', key='remove_file'):
+        st.session_state.file = 'real_estate_property_catalog.csv'
+        file= None
 
     if file:
         data, subtitle, err_data = set_data(file.name)
@@ -104,12 +80,21 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 1
 
+
+    screen_width = get_monitors()[0].width
+    
     pages = len(data) // 21
+
+    if screen_width >= 1310 and screen_width < 1720:
+        pages = len(data) // 14
+    elif screen_width < 1310:
+        pages = len(data) // 7
+
     if pages == 0:
         pages = 1
 
     # Display data page
-    show_page(data, st.session_state.page, lang)
+    show_page(data, st.session_state.page, lang, screen_width)
 
     # Add pagination buttons
     col1, col2, col3 = st.columns(3)
@@ -128,15 +113,23 @@ def main():
                 st.rerun()
     return
 
-
-def show_page(data, page, lang):
+def show_page(data, page, lang, screen_width):
     # Calculate the indexes for the current page
     page_indicator = page * 21  
     indexes = [page_indicator - 21, page_indicator]
+    row_of = 3
+    if screen_width >= 1310 and screen_width < 1720:
+        page_indicator = page * 14
+        indexes = [page_indicator - 14, page_indicator]
+        row_of = 2
+    elif screen_width < 1310:
+        page_indicator = page * 7
+        indexes = [page_indicator - 7, page_indicator]
+        row_of = 1
 
     # handle display of page data in rows of 4
-    for i in range(indexes[0], min(indexes[1], len(data)), 3):
-        row = st.columns(3)
+    for i in range(indexes[0], min(indexes[1], len(data)), row_of):
+        row = st.columns(row_of)
         for j, r in enumerate(row):
             if i + j < len(data):
                 with r:
@@ -181,6 +174,5 @@ def show_page(data, page, lang):
                     except Exception as e:
                         st.error(f"Error displaying row {i + j}: {e}")
     return
-
 
 main()

@@ -1,8 +1,10 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 
 import folium
 from streamlit_folium import st_folium
+
 
 @st.dialog("Περιγραφή Ιδιοκτησίας", width='large')
 def open_details(row_data, image, lang):
@@ -325,6 +327,7 @@ def show_map(row_data, image_link):
     map = folium.Map(location=[lat, lng], zoom_start=15)
     folium.Marker(location=[lat, lng], popup=row_data['address_gr'], lazy=True).add_to(map)
     return map
+
 
 def main():
 

@@ -8,6 +8,17 @@ from streamlit_folium import st_folium
 
 @st.dialog("Περιγραφή Ιδιοκτησίας", width='large')
 def open_details(row_data, image, lang):
+
+    st.markdown("""
+                <style>
+                @media (max-width: 650px) {
+                    div[data-testid='stVerticalBlockBorderWrapper'] {
+                        overflow: hidden!important; 
+                    }
+                }
+                """,
+                unsafe_allow_html=True)
+
     main_dtls_1, main_dtls_2 = st.columns([3,1])
     img = st.columns(1)
 
@@ -138,9 +149,8 @@ def apply_style():
             justify-content: center;
         }
         .stElementContainer {
-            justify-content: center;
             display: flex;
-            Stext-align: center;
+            justify-content: center;
         }
         .st-emotion-cache-17c4ue {
             display: flex;
@@ -151,6 +161,21 @@ def apply_style():
         }
         div[data-testid='stVerticalBlockBorderWrapper'] {
             overflow: auto!important; 
+        }
+        .stButton {
+            width: auto!important;
+            }
+        @media (max-width: 576px) {
+            .st-emotion-cache-qy2b8d .e1blfcsg0 {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        @media (max-width: 436px) {
+            .div[data-testid='stHorizontalBlock'] {
+                max-height: 300px!important;
+            }
         }
     }
                 

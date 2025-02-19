@@ -130,6 +130,30 @@ def apply_style():
         background-color: #ff5454!important;
         color: white!important;
     }
+    @media (max-width: 650px) {
+        .st-key-map_view .stButton {
+            justify-content: center;
+        }
+        .st-key-list_view .stButton {
+            justify-content: center;
+        }
+        .stElementContainer {
+            justify-content: center;
+            display: flex;
+            Stext-align: center;
+        }
+        .st-emotion-cache-17c4ue {
+            display: flex;
+            justify-content: center;
+        }
+        .st-emotion-cache-p38tq, .st-emotion-cache-1wivap2 > div  {
+            text-align: center!important;
+        }
+        div[data-testid='stVerticalBlockBorderWrapper'] {
+            overflow: auto!important; 
+        }
+    }
+                
     </style>
     """, unsafe_allow_html=True)
 

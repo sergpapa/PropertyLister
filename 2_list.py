@@ -19,7 +19,7 @@ def apply_styles():
             margin: auto;
         }
         div[data-testid='stVerticalBlockBorderWrapper'] {
-                                    overflow: hidden;
+            overflow: hidden;
         }
         .image {
             float: left;
@@ -41,6 +41,14 @@ def apply_styles():
         }
         .stFileUploaderFile {
             display: none;
+        }
+        @media (max-width: 1320px) {
+            .st-emotion-cache-wt9exi {
+                min-width: calc(100% - 1.5rem);
+            }
+            .st-emotion-cache-fvdmmq {
+                min-width: calc(100% - 1.5rem);
+            }
         }
         </style>
         """,
@@ -81,23 +89,14 @@ def main():
 
     if 'page' not in st.session_state:
         st.session_state.page = 1
-
-
-    # screen_width = get_monitors()[0].width
-    screen_width = 1920
     
-    pages = len(data) // 21
-
-    if screen_width >= 1310 and screen_width < 1720:
-        pages = len(data) // 14
-    elif screen_width < 1310:
-        pages = len(data) // 7
+    pages = len(data) // 14
 
     if pages == 0:
         pages = 1
 
     # Display data page
-    show_page(data, st.session_state.page, lang, screen_width)
+    show_page(data, st.session_state.page, lang)
 
     # Add pagination buttons
     col1, col2, col3 = st.columns(3)
@@ -117,19 +116,12 @@ def main():
     return
 
 
-def show_page(data, page, lang, screen_width):
+def show_page(data, page, lang):
     # Calculate the indexes for the current page
-    page_indicator = page * 21  
-    indexes = [page_indicator - 21, page_indicator]
-    row_of = 3
-    if screen_width >= 1310 and screen_width < 1720:
-        page_indicator = page * 14
-        indexes = [page_indicator - 14, page_indicator]
-        row_of = 2
-    elif screen_width < 1310:
-        page_indicator = page * 7
-        indexes = [page_indicator - 7, page_indicator]
-        row_of = 1
+    
+    page_indicator = page * 14
+    indexes = [page_indicator - 14, page_indicator]
+    row_of = 2
 
     # handle display of page data in rows of 4
     for i in range(indexes[0], min(indexes[1], len(data)), row_of):

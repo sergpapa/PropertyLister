@@ -21,10 +21,13 @@ def apply_styles():
         div[data-testid='stVerticalBlockBorderWrapper'] {
             overflow: hidden;
         }
+        div[data-testid='stMarkdownContainer'] {
+            overflow: auto;
+        }
         .image {
             float: left;
             width:  250px;
-            height: 250px;
+            height: 350px;
             object-fit: cover;
             border-radius: 2%;
         }
@@ -132,7 +135,7 @@ def show_page(data, page, lang):
                     try:
                         row_data = data.iloc[i + j].astype(object).to_dict()
 
-                        container = st.container(key=f"card_container_{i+j}", height=450, border=True)
+                        container = st.container(key=f"card_container_{i+j}", height=550, border=True)
 
                         main_dtls_1, main_dtls_2 = container.columns([3,1])
                         img = container.columns(1)

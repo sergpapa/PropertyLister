@@ -142,6 +142,9 @@ def apply_style():
         color: white!important;
     }
     @media (max-width: 650px) {
+        .st-emotion-cache-1104ytp {
+            margin-bottom: 0!important;
+        }
         .st-key-map_view .stButton {
             justify-content: center;
         }
@@ -164,7 +167,10 @@ def apply_style():
         }
         .stButton {
             width: auto!important;
-            }
+        }
+        .st-emotion-cache-1mw54nq {
+            max-height: 230px!important;
+        }
         @media (max-width: 576px) {
             .st-emotion-cache-qy2b8d .e1blfcsg0 {
                 display: flex;
@@ -174,7 +180,7 @@ def apply_style():
         }
         @media (max-width: 436px) {
             .div[data-testid='stHorizontalBlock'] {
-                max-height: 300px!important;
+                max-height: 230px!important;
             }
         }
     }
@@ -188,24 +194,32 @@ def apply_style():
 def create_sidebar():
 
     sidebar = st.sidebar
-    search_term = sidebar.text_input('##### Search Properties', key='search', placeholder='Search by address, price, etc.')
+
+    search_term = sidebar.text_input('##### Search Properties', key='search', placeholder='Search by address, price, etc.', value=st.session_state.search_term)
 
     sidebar.write('##### Filter Properties')
 
-    price_min = sidebar.number_input('Price Min', placeholder='0', min_value=0)
-    price_max = sidebar.number_input('Price Max', placeholder='1000000', min_value=0)
+    price_min = sidebar.number_input('Price Min', placeholder='0', min_value=0, value=st.session_state.price_min)
+    price_max = sidebar.number_input('Price Max', placeholder='1000000', min_value=0, value=st.session_state.price_max)
 
-    surface_min = sidebar.number_input('Surface Min', placeholder='0', min_value=0)
-    surface_max = sidebar.number_input('Surface Max', placeholder='500', min_value=0)
+    surface_min = sidebar.number_input('Surface Min', placeholder='0', min_value=0, value=st.session_state.surface_min)
+    surface_max = sidebar.number_input('Surface Max', placeholder='500', min_value=0, value=st.session_state.surface_max)
 
-    construction_year = sidebar.number_input('Construction Year', placeholder='0', min_value=0)
+    construction_year = sidebar.number_input('Construction Year', placeholder='0', min_value=0, value=st.session_state.construction_year)
 
     has_parking = sidebar.toggle('Parking')
     has_storage = sidebar.toggle('Storage')
 
-    sidebar.button('Clear Filters', key='clear_filters', on_click=lambda: st.session_state.clear(
-        price_min=None, price_max=None, surface_min=None, surface_max=None, construction_year=None, parking=False, storage=False
-    ))
+    if sidebar.button('Clear Filters', key='clear_filters'):
+        st.session_state.search_term = ''
+        st.session_state.price_min = 0
+        st.session_state.price_max = 0
+        st.session_state.surface_min = 0
+        st.session_state.surface_max = 0
+        st.session_state.construction_year = 0
+        st.session_state.parking = False
+        st.session_state.storage = False
+        st.rerun()
 
     filter_data = False
 
@@ -217,6 +231,7 @@ def create_sidebar():
     if st.session_state.price_min != price_min:
         st.session_state.price_min = price_min
         filter_data = True
+
     if st.session_state.price_max != price_max:
         st.session_state.price_max = price_max
         filter_data = True
@@ -224,10 +239,11 @@ def create_sidebar():
     if st.session_state.surface_min != surface_min:
         st.session_state.surface_min = surface_min
         filter_data = True
+
     if st.session_state.surface_max != surface_max:
         st.session_state.surface_max = surface_max
         filter_data = True
-    
+
     if st.session_state.construction_year != construction_year:
         st.session_state.construction_year = construction_year
         filter_data = True

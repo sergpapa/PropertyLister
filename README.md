@@ -138,6 +138,16 @@ Users can explore available properties through two main views: a List View and a
 
         ![Interactive Map View](media/map-feature.png)
 
+- ### **Pagination Feature**
+
+    The app includes a pagination feature that allows users to navigate through a large list of properties by breaking the listings into multiple pages. The pagination controls provide the following functionality:
+    - **Next/Previous Page**: Allows users to move to the next or previous set of properties.
+    - **Page Numbers**: Users can directly navigate to a specific page by clicking on the page number.
+    - Displays a predefined number of properties per page to ensure smooth browsing.
+
+    - *Pagination Feature*
+        ![Pagination Feature](media/paginataion-feature.png)
+
 - ### **Full Details View**
 
     Each property has a dedicated Full Details Page, providing a comprehensive overview of the listing, including:

@@ -4,7 +4,7 @@
 
 Welcome to PropertyLister, the ultimate real estate search experience! Our app allows you to easily and quickly explore a wide variety of listings tailored to your needs.
 
-*Welcome to [Guilty Sheep](https://propertylister.streamlit.app)*
+*Welcome to [PropertLister](https://propertylister.streamlit.app)*
 
 ![Guilty Sheep mockup](media/property-listings-mockup.png)
 
@@ -115,7 +115,7 @@ Additional Page:
 
 # **Features**
 
-The Guilty Sheep wesite is designed to be simple to navigate and easy to use.
+The PropertyLister website is designed to be simple to navigate and easy to use.
 
 ## **Existing features**
 

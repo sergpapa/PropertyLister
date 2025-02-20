@@ -48,7 +48,7 @@ The PropertyList website has been tested manually as well as with automated serv
   
   ![ Python validator](media/python-validator.png)
 
-  # **Feature Testing Documentation – PropertyLister**  
+# **Feature Testing Documentation – PropertyLister**  
 
 ## **Navigation Menu**  
 - **Expected:** The feature is expected to allow seamless navigation between different sections of the app.  
@@ -79,7 +79,7 @@ The PropertyList website has been tested manually as well as with automated serv
 ## **Advanced Search & Filtering**  
 ### **Keyword Search**  
 - **Expected:** Users should be able to search for properties using keywords.  
-- **Testing:** Entered various keywords (e.g., "apartment," "villa," "Athens") into the search bar and checked if relevant properties appeared.  
+- **Testing:** Entered various keywords into the search bar and checked if relevant properties appeared.  
 - **Result:** The feature correctly displayed relevant properties matching the search query.  
 
 ### **Sorting & Filtering**  
@@ -107,7 +107,7 @@ The PropertyList website has been tested manually as well as with automated serv
 - ## Perofrmance 
 
     |         |**Home**|**Products**| **Product Details**|
-    |---------|---------|-------------|--------|----------|
+    |---------|--------|------------|--------------------|
     |  Buttons |   Pass  |   Pass    |  Pass   |
     |  Links |   Pass  |   Pass    |  Pass   |
     |  Images |   Pass  |   Pass    |  Pass   |
@@ -185,7 +185,7 @@ Responsiveness tests were carried out manually with a combination of device test
 - **As a user, I want to search for properties by keywords, so I can quickly locate specific items.**
   
     - **Expected:** Users should be able to search for properties using specific keywords.
-    - **Testing:** Entered various keywords in the search bar (e.g., "apartment," "villa," "garden") and checked if the correct properties were shown.
+    - **Testing:** Entered various keywords in the search bar and checked if the correct properties were shown.
     - **Result:** The search feature worked correctly, returning relevant properties based on the keyword.
 
 ## **Interactive Map View with Markers**

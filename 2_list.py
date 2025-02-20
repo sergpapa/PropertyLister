@@ -116,7 +116,6 @@ def main():
         if st.button('Previous Page', key='prev_page', disabled=st.session_state.page <= 1):
             if st.session_state.page > 1:
                 st.session_state.page -= 1
-                st.session_state.page -= 1
                 st.rerun()
     with col2:
         st.markdown(f"<div class='page_count' style='text-align: center;height:40px;'>Page {st.session_state.page} of {pages}</div>", unsafe_allow_html=True)

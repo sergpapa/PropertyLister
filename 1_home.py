@@ -6,25 +6,31 @@ from main import open_details, set_data
 
 
 def main():
-    st.title('Real Estate Property Catalog')
+    """
+    Main function for the home page. Displays some wecoming info and some metrics about the CSV file.
+    """
 
     errors = []
 
+    st.title('Real Estate Property Catalog')
+
+    # Check if a file has been uploaded and set data accordingly
     if 'file' not in st.session_state:
         file_name = st.session_state.file = 'real_estate_property_catalog.csv'
         data, subtitle, err_data = set_data(None)
         if err_data:
             for err in err_data:
-                errors.append(f"Errors in data: {err[0]}")
+                errors.append(f"Errors in setting data: {err[0]}")
     else:
         file_name = st.session_state.file
         data, subtitle, err_data = set_data(file_name)
         if err_data:
             for err in err_data:
-                errors.append(f"Errors in data: {err[0]}")
+                errors.append(f"Errors in setting data: {err[0]}")
     
     data = pd.read_csv(file_name)
 
+    # format and clean data
     data['has_parking'] = data['has_parking'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
     data['has_storage'] = data['has_storage'].fillna('FALSE').astype(str).str.upper() == 'TRUE'
 
@@ -51,6 +57,7 @@ def main():
                 <br>
           """, unsafe_allow_html=True)
 
+    # Add buttons for switching between list and map view pages
     buttons = st.columns(2)
     if buttons[0].button('List View', key='list_view'):
         st.switch_page('2_list.py')
@@ -81,6 +88,7 @@ def main():
                 </p>
           """, unsafe_allow_html=True)  
 
+    # display metrics about the data
     metrics = st.columns(4)
 
     for metric in metrics:
@@ -95,9 +103,6 @@ def main():
     metrics[3].metric('Μέσο Εμβαδόν', f'{mean_surface:.2f} m²')
 
     data = data.dropna(subset=['price', 'construction_year'])
-
-    # create graph for price vs construction year
-
 
     return
 

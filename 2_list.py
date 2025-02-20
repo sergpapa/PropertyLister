@@ -1,9 +1,12 @@
 import streamlit as st
 from main import open_details, set_data
-from screeninfo import get_monitors
 
 
 def apply_styles():
+    """
+    Apply custom styles to the Streamlit app.
+    """
+
     st.markdown(
         """
         <style>
@@ -61,7 +64,9 @@ def apply_styles():
 
 
 def main():
-    errors = []
+    """
+    Main function for the 'List' page. Sets data set and paggination cutoffs. Also allows for file upload and removal of a new CSV file.
+    """
 
     apply_styles()
     
@@ -69,27 +74,31 @@ def main():
     lang = st.session_state.lang
 
     col1.title('Property Listings - List')
+
+    # upload new file or remove current file
     file = col2.file_uploader('Upload a CSV file', type=['csv'])
     if col2.button('Remove File', key='remove_file'):
         st.session_state.file = 'real_estate_property_catalog.csv'
         file= None
 
+    # Check if a file has been uploaded and set data accordingly. if errors are found, display them
     if file:
         data, subtitle, err_data = set_data(file.name)
 
         if err_data:
             for err in err_data:
-                st.error(f"Errors in data: {err[0]}")
+                st.error(f"Errors in data: {err}")
         
     else:
         data, subtitle, err_data = set_data(None)
 
         if err_data:
             for err in err_data:
-                st.error(f"Errors in data: {err[0]}")
+                st.error(f"Errors in data: {err}")
         
     st.write(f"***Reading Data From:*** *{subtitle}*")
 
+    # Set pagination based on data length
     if 'page' not in st.session_state:
         st.session_state.page = 1
     
@@ -120,13 +129,16 @@ def main():
 
 
 def show_page(data, page, lang):
+    """
+    Display the current page of data. Render a container for each row of data.
+    """
+
     # Calculate the indexes for the current page
-    
     page_indicator = page * 14
     indexes = [page_indicator - 14, page_indicator]
     row_of = 2
 
-    # handle display of page data in rows of 4
+    # handle display of page data in rows of 2. For each row, display the data in a container
     for i in range(indexes[0], min(indexes[1], len(data)), row_of):
         row = st.columns(row_of)
         for j, r in enumerate(row):
@@ -145,8 +157,9 @@ def show_page(data, page, lang):
                         main_dtls_1.markdown(f"{row_data['address_gr']}")
                         main_dtls_2.markdown(f"<p class='head_dtls' style='text-align:right;'><strong>&#8364; {row_data['price']}</strong></p>", unsafe_allow_html=True)
 
+                        # handle image display
                         img_url = row_data['img_url']
-        
+
                         if type(img_url) == str:
 
                             img_urls = img_url.split("'")
